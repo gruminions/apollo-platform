@@ -81,11 +81,29 @@ int main(int argc, char **argv) {
    * buffer up before throwing some away.
    */
   // %Tag(PUBLISHER)%
-  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1000);
+  ros::Publisher chatter_pub = n.advertise<std_msgs::String>("chatter", 1);
   // %EndTag(PUBLISHER)%
 
+  int msg_len = 1000;
+  if (argc > 1) {
+    msg_len = atoi(argv[1]);
+  }
+
+  int msg_num = 1000;
+  if (argc > 2) {
+    msg_num = atoi(argv[2]);
+  }
+
+  double freq = 100.0;
+  if (argc > 3) {
+    freq = atof(argv[3]);
+  }
+
+  std::cout << "message length: " << msg_len << "\n"
+            << "message number: " << msg_num << "\n"
+            << "message frequency: " << freq << std::endl;
   // %Tag(LOOP_RATE)%
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(freq);
   // %EndTag(LOOP_RATE)%
 
   /**
@@ -94,7 +112,7 @@ int main(int argc, char **argv) {
    */
   // %Tag(ROS_OK)%
   int count = 0;
-  const std::string foo_content(307200, '+');
+  const std::string foo_content(msg_len, 'c');
   while (ros::ok()) {
     // %EndTag(ROS_OK)%
     /**
@@ -105,7 +123,7 @@ int main(int argc, char **argv) {
     msg.data = foo_content;
 
     std::stringstream ss;
-    ss << ros::Time::now().toNSec();
+    ss << '+' << ros::Time::now().toNSec();
     msg.data.append(ss.str());
     // %EndTag(FILL_MESSAGE)%
 
@@ -131,7 +149,7 @@ int main(int argc, char **argv) {
     loop_rate.sleep();
     // %EndTag(RATE_SLEEP)%
     ++count;
-    if (count == 10000) {
+    if (count == msg_num) {
       std::cout << "talk over" << std::endl;
       break;
     }

@@ -42,7 +42,8 @@ void chatterCallback(const std_msgs::String::ConstPtr& msg) {
   // ROS_INFO("I heard: [%s]", msg->data.c_str());
   uint64_t now = ros::Time::now().toNSec();
   // ROS_INFO("I heard: [%s]", msg->data.c_str() + 307190);
-  std::string ts(msg->data, 307200);
+  std::size_t idx = msg->data.find_last_of('+');
+  std::string ts(msg->data, idx + 1);
   total_latency += now - atol(ts.c_str());
   ++count;
 }
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
    * throw away the oldest ones.
    */
   // %Tag(SUBSCRIBER)%
-  ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
+  ros::Subscriber sub = n.subscribe("chatter", 1, chatterCallback);
   // %EndTag(SUBSCRIBER)%
 
   /**
